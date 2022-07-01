@@ -1,0 +1,45 @@
+-- Створити таблицю в БД
+CREATE TABLE parcels(
+   cadnum text,
+   category text,
+   purpose_code text,
+   purpose text,
+   use text,
+   area text,
+   ownershipcode text,
+   ownership text,
+   geometry text
+);
+
+-- Додати ключ
+ALTER TABLE parcels ADD column id serial PRIMARY KEY;
+
+--створення поля геометрії
+SELECT AddGeometryColumn ('parcels', 'geom', 3857, 'MULTIPOLYGON', 2 ); #4326
+
+-- Видалити все з таблиці і почати ID з нуля
+TRUNCATE TABLE parcels RESTART IDENTITY
+
+
+--To see where the data directory is, use this query.
+show data_directory;
+
+--to find the size of a specific database by using following command:
+select pg_database_size('databaseName');
+
+SELECT pg_size_pretty( pg_database_size( current_database() ) ) As human_size
+    , pg_database_size( current_database() ) As raw_size;
+
+
+
+
+UPDATE parcel_info
+SET geom = ST_PointFromText(ppoint, 3857);
+
+SELECT count(*) FROM parcel_info
+
+-- kill-all-connections-to-db.sql
+SELECT pg_terminate_backend(pg_stat_activity.pid)
+FROM pg_stat_activity
+WHERE pg_stat_activity.datname = '[your database name goes here]'
+  AND pid <> pg_backend_pid();
